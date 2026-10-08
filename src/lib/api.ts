@@ -87,27 +87,27 @@ export type GlobalIndicators = {
 }
 
 export const PRESETS: Place[] = [
-  { name: "تهران", admin: "استان تهران", country: "ایران", latitude: 35.69439, longitude: 51.42151 },
-  { name: "اهواز", admin: "خوزستان", country: "ایران", latitude: 31.3183, longitude: 48.6706 },
-  { name: "بندرعباس", admin: "هرمزگان", country: "ایران", latitude: 27.1832, longitude: 56.2666 },
-  { name: "رشت", admin: "گیلان", country: "ایران", latitude: 37.2808, longitude: 49.5832 },
-  { name: "تبریز", admin: "آذربایجان شرقی", country: "ایران", latitude: 38.08, longitude: 46.2919 },
-  { name: "مشهد", admin: "خراسان رضوی", country: "ایران", latitude: 36.2605, longitude: 59.6168 },
-  { name: "دبی", country: "امارات", latitude: 25.2048, longitude: 55.2708 },
-  { name: "داکا", country: "بنگلادش", latitude: 23.8103, longitude: 90.4125 },
-  { name: "ماله", country: "مالدیو", latitude: 4.1755, longitude: 73.5093 },
-  { name: "مانائوس", country: "برزیل", latitude: -3.119, longitude: -60.0217 },
-  { name: "نوک", country: "گرینلند", latitude: 64.1814, longitude: -51.6941 },
-  { name: "اقیانوس منجمد شمالی", latitude: 85, longitude: 15 },
-  { name: "لندن", country: "بریتانیا", latitude: 51.5072, longitude: -0.1276 },
-  { name: "توکیو", country: "ژاپن", latitude: 35.6762, longitude: 139.6503 },
-  { name: "سیدنی", country: "استرالیا", latitude: -33.8688, longitude: 151.2093 },
+  { name: "Tehran", admin: "Tehran Province", country: "Iran", latitude: 35.69439, longitude: 51.42151 },
+  { name: "Ahvaz", admin: "Khuzestan", country: "Iran", latitude: 31.3183, longitude: 48.6706 },
+  { name: "Bandar Abbas", admin: "Hormozgan", country: "Iran", latitude: 27.1832, longitude: 56.2666 },
+  { name: "Rasht", admin: "Gilan", country: "Iran", latitude: 37.2808, longitude: 49.5832 },
+  { name: "Tabriz", admin: "East Azerbaijan", country: "Iran", latitude: 38.08, longitude: 46.2919 },
+  { name: "Mashhad", admin: "Razavi Khorasan", country: "Iran", latitude: 36.2605, longitude: 59.6168 },
+  { name: "Dubai", country: "United Arab Emirates", latitude: 25.2048, longitude: 55.2708 },
+  { name: "Dhaka", country: "Bangladesh", latitude: 23.8103, longitude: 90.4125 },
+  { name: "Male", country: "Maldives", latitude: 4.1755, longitude: 73.5093 },
+  { name: "Manaus", country: "Brazil", latitude: -3.119, longitude: -60.0217 },
+  { name: "Nuuk", country: "Greenland", latitude: 64.1814, longitude: -51.6941 },
+  { name: "Arctic Ocean", latitude: 85, longitude: 15 },
+  { name: "London", country: "United Kingdom", latitude: 51.5072, longitude: -0.1276 },
+  { name: "Tokyo", country: "Japan", latitude: 35.6762, longitude: 139.6503 },
+  { name: "Sydney", country: "Australia", latitude: -33.8688, longitude: 151.2093 },
 ]
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal, headers: { Accept: "application/json" } })
   if (!response.ok) {
-    throw new Error(`دریافت داده ناموفق بود (${response.status})`)
+    throw new Error(`Request failed (${response.status})`)
   }
   return (await response.json()) as T
 }
@@ -121,7 +121,7 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
       return [await reversePlace(latitude, longitude, signal)]
     }
   }
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=fa&format=json`
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`
   const data = await getJson<{
     results?: Array<{
       name: string
@@ -141,7 +141,7 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
 }
 
 export async function reversePlace(latitude: number, longitude: number, signal?: AbortSignal): Promise<Place> {
-  const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=fa`
+  const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
   const response = await fetch(url, { signal })
   const data = (await response.json()) as {
     city?: string
@@ -149,7 +149,7 @@ export async function reversePlace(latitude: number, longitude: number, signal?:
     principalSubdivision?: string
     countryName?: string
   }
-  const name = data.city || data.locality || "نقطه انتخاب‌شده"
+  const name = data.city || data.locality || "Selected point"
   return {
     name,
     admin: data.principalSubdivision,

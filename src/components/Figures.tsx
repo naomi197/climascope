@@ -47,7 +47,7 @@ export function HourRibbon({
   const area = `${linePath(points)} L${points[points.length - 1]?.x ?? 16} 132 L${points[0]?.x ?? 16} 132 Z`
   const maxPrecip = Math.max(...precips, 1)
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="دمای ۲۴ ساعت آینده">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Temperature over the next 24 hours">
       <path d={area} fill="url(#tempFill)" />
       <path d={linePath(points)} fill="none" stroke="#2ee6c7" strokeWidth="2.4" />
       {precips.map((value, index) => {
@@ -91,7 +91,7 @@ export function ClimateLines({
   const lower = project(low)
   const band = `${linePath(upper)} ${[...lower].reverse().map((point) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ")} Z`
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="مقایسه دمای ماهانه دو دوره">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Monthly temperature for two periods">
       <path d={band} fill="rgba(232,160,106,.16)" />
       <path d={linePath(base)} fill="none" stroke="#8ecbff" strokeWidth="2.2" />
       <path d={linePath(next)} fill="none" stroke="#e8a06a" strokeWidth="2.4" />
@@ -110,7 +110,7 @@ export function PrecipBars({ baseline, future }: { baseline: number[]; future: n
   const max = Math.max(...baseline, ...future, 1)
   const slot = width / 12
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="بارش ماهانه دو دوره">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Monthly precipitation for two periods">
       {baseline.map((value, index) => {
         const h = (value / max) * 120
         const x = index * slot + 8
@@ -138,7 +138,7 @@ export function AqiGauge({ value }: { value: number }) {
   const x = cx + r * Math.cos(radians)
   const y = cy - r * Math.sin(radians)
   return (
-    <svg className="gauge" viewBox="0 0 180 110" role="img" aria-label="شاخص کیفیت هوا">
+    <svg className="gauge" viewBox="0 0 180 110" role="img" aria-label="Air quality index">
       <path d="M22 88 A68 68 0 0 1 158 88" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="12" strokeLinecap="round" />
       <path d="M22 88 A68 68 0 0 1 158 88" fill="none" stroke="url(#aqiScale)" strokeWidth="12" strokeLinecap="round" />
       <circle cx={x} cy={y} r="6" fill="#f4f7f6" />
@@ -168,7 +168,7 @@ export function WeekChart({
   const lo = project(mins)
   const band = `${linePath(hi)} ${[...lo].reverse().map((point) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ")} Z`
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="بازه دمای هفت روز">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Seven-day temperature range">
       <path d={band} fill="rgba(46,230,199,.16)" />
       <path d={linePath(hi)} fill="none" stroke="#e8a06a" strokeWidth="2.2" />
       <path d={linePath(lo)} fill="none" stroke="#8ecbff" strokeWidth="2.2" />

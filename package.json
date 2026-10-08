@@ -1,5 +1,5 @@
 {
-  "name": "eghlimnama",
+  "name": "climascope",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@capacitor/core": "^8.5.3",
     "@capacitor/geolocation": "^8.2.3",
-    "@fontsource/vazirmatn": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

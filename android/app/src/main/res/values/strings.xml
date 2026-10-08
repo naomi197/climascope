@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">اقلیم‌نما</string>
-    <string name="title_activity_main">اقلیم‌نما</string>
-    <string name="package_name">com.alirezafazeli.eghlimnama</string>
-    <string name="custom_url_scheme">com.alirezafazeli.eghlimnama</string>
-    <string name="developer_email">alirezafazeli@live.cim</string>
+    <string name="app_name">ClimaScope</string>
+    <string name="title_activity_main">ClimaScope</string>
+    <string name="package_name">com.alirezafazeli.climascope</string>
+    <string name="custom_url_scheme">com.alirezafazeli.climascope</string>
+    <string name="developer_email">alirezafazeli@live.com</string>
 </resources>

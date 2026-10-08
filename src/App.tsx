@@ -32,7 +32,7 @@ import {
   monthName,
   parseDecimalMonth,
   uvLabel,
-  weatherFa,
+  weatherText,
   weekdayIso,
   windDir,
 } from "./lib/format.ts"
@@ -163,7 +163,7 @@ export default function App() {
     try {
       openPlace(await reversePlace(latitude, longitude))
     } catch {
-      openPlace({ name: "نقطه انتخاب‌شده", latitude, longitude })
+      openPlace({ name: "Selected point", latitude, longitude })
     }
   }
 
@@ -172,14 +172,14 @@ export default function App() {
       const permission = await Geolocation.requestPermissions()
       const granted = permission.location === "granted" || permission.coarseLocation === "granted"
       if (!granted && permission.location !== "prompt") {
-        setNotice("دسترسی به موقعیت مکانی داده نشد.")
+        setNotice("Location permission was denied.")
         return
       }
       const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 12000 })
       await chooseMap(position.coords.latitude, position.coords.longitude)
       setNotice(null)
     } catch {
-      setNotice("موقعیت فعلی در دسترس نیست. نام شهر یا مختصات را وارد کنید.")
+      setNotice("Current location is unavailable. Search for a city or enter coordinates.")
     }
   }
 
@@ -207,56 +207,56 @@ export default function App() {
         <div className="brand">
           <Mark />
           <div>
-            <p className="eyebrow">رصدخانه همراه تغییر اقلیم</p>
-            <h1>اقلیم‌نما</h1>
+            <p className="eyebrow">Climate observatory</p>
+            <h1>ClimaScope</h1>
           </div>
         </div>
-        <p className="lede">پارامترهای جوی، کیفیت هوا، آب‌شناسی و چشم‌انداز مدل‌های اقلیمی برای هر نقطه از زمین.</p>
+        <p className="lede">Atmosphere, air quality, hydrology, and climate-model outlook for any point on Earth.</p>
       </header>
 
-      <section className="pulse" aria-label="شاخص‌های جهانی">
-        {globalState === "error" && <p className="inline-error">شاخص‌های جهانی فعلاً در دسترس نیستند.</p>}
+      <section className="pulse" aria-label="Global indicators">
+        {globalState === "error" && <p className="inline-error">Global indicators are unavailable right now.</p>}
         {globalState === "loading" &&
           Array.from({ length: 5 }, (_, index) => <div key={index} className="pulse-card skeleton" />)}
         {globals && (
           <>
             <PulseCard
-              kicker="دی‌اکسید کربن"
+              kicker="Carbon dioxide"
               value={fmt(globals.co2.value, 2)}
-              unit="ppm روند"
-              note={`چرخه ${fmt(globals.co2.cycle, 1)} · ${labelIsoDate(globals.co2.when)}`}
+              unit="ppm trend"
+              note={`cycle ${fmt(globals.co2.cycle, 1)} · ${labelIsoDate(globals.co2.when)}`}
               series={globals.co2.series}
               color="#e8a06a"
             />
             <PulseCard
-              kicker="متان"
+              kicker="Methane"
               value={fmt(globals.methane.value, 1)}
-              unit="ppb روند"
+              unit="ppb trend"
               note={ch4When}
               series={globals.methane.series}
               color="#e7c56a"
             />
             <PulseCard
-              kicker="اکسید نیتروژن"
+              kicker="Nitrous oxide"
               value={fmt(globals.nitrous.value, 2)}
-              unit="ppb روند"
+              unit="ppb trend"
               note={n2oWhen}
               series={globals.nitrous.series}
               color="#8ecbff"
             />
             <PulseCard
-              kicker="ناهنجاری دمای جهانی"
+              kicker="Global temperature anomaly"
               value={fmtSigned(globals.temperature.value, 2)}
-              unit="°C خشکی-اقیانوس"
+              unit="°C land-ocean"
               note={labelDecimalYear(globals.temperature.when)}
               series={globals.temperature.series}
               color="#ff8f78"
             />
             <PulseCard
-              kicker="یخ دریا"
+              kicker="Sea ice"
               value={fmtSigned(globals.ice.anomaly, 2)}
-              unit="میلیون km² ناهنجاری"
-              note={`${fmt(globals.ice.extent, 2)} گستره · ${iceWhen}`}
+              unit="million km² anomaly"
+              note={`${fmt(globals.ice.extent, 2)} extent · ${iceWhen}`}
               series={globals.ice.series}
               color="#8ecbff"
             />
@@ -267,20 +267,20 @@ export default function App() {
       <div className="workspace">
         <aside className="finder">
           <div className="search">
-            <label htmlFor="place-search">مکان یا مختصات</label>
+            <label htmlFor="place-search">Place or coordinates</label>
             <div className="search-row">
               <input
                 id="place-search"
                 value={query}
-                placeholder="نام شهر یا کشور"
+                placeholder="City, country, or lat, lon"
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
               />
               <button type="button" className="ghost" onClick={() => void locateMe()}>
-                مکان من
+                My location
               </button>
             </div>
-            {searching && <p className="hint">در حال جستجو…</p>}
+            {searching && <p className="hint">Searching…</p>}
             {shownResults.length > 0 && (
               <ul className="results">
                 {shownResults.map((item) => (
@@ -290,14 +290,14 @@ export default function App() {
                       onClick={() => openPlace(item)}
                     >
                       <strong>{item.name}</strong>
-                      <span>{[item.admin, item.country].filter(Boolean).join("، ")}</span>
+                      <span>{[item.admin, item.country].filter(Boolean).join(", ")}</span>
                     </button>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          <div className="chips" aria-label="مکان‌های آماده">
+          <div className="chips" aria-label="Saved places">
             {PRESETS.map((item) => (
               <button
                 key={item.name}
@@ -311,7 +311,7 @@ export default function App() {
           </div>
           <div className="map-wrap">
             <ObserveMap lat={place.latitude} lon={place.longitude} onPick={(lat, lon) => void chooseMap(lat, lon)} />
-            <p className="map-caption">لمس نقشه، همان مختصات را باز می‌کند.</p>
+            <p className="map-caption">Tap the map to open that coordinate.</p>
           </div>
           {notice && <p className="inline-error">{notice}</p>}
         </aside>
@@ -319,15 +319,15 @@ export default function App() {
         <main className="board">
           <section className="place-head">
             <div>
-              <p className="eyebrow">ایستگاه مجازی</p>
+              <p className="eyebrow">Virtual station</p>
               <h2>{place.name}</h2>
-              <p className="sub">{[place.admin, place.country].filter(Boolean).join("، ")}</p>
+              <p className="sub">{[place.admin, place.country].filter(Boolean).join(", ")}</p>
             </div>
             <div className="place-meta">
               <span>{coordPair(place.latitude, place.longitude)}</span>
               {weather && (
                 <>
-                  <span>ارتفاع {fmt(weather.elevation, 0)} متر</span>
+                  <span>Elevation {fmt(weather.elevation, 0)} m</span>
                   <span>{clock || weather.timezone}</span>
                 </>
               )}
@@ -336,8 +336,8 @@ export default function App() {
 
           {wxState === "error" && (
             <section className="panel error-panel">
-              <h3>داده این نقطه دریافت نشد</h3>
-              <p>اتصال را بررسی کنید و دوباره تلاش کنید.</p>
+              <h3>This location could not be loaded</h3>
+              <p>Check the connection and try again.</p>
               <button
                 type="button"
                 onClick={() => {
@@ -350,13 +350,13 @@ export default function App() {
                   setReload((value) => value + 1)
                 }}
               >
-                تلاش دوباره
+                Try again
               </button>
             </section>
           )}
 
           {wxState === "loading" && (
-            <section className="panel skeleton-block" aria-label="در حال دریافت داده">
+            <section className="panel skeleton-block" aria-label="Loading observations">
               <div className="skeleton hero-skeleton" />
               <div className="metric-grid">
                 {Array.from({ length: 8 }, (_, index) => (
@@ -370,21 +370,21 @@ export default function App() {
             <>
               <section className="hero panel">
                 <div>
-                  <p className="eyebrow">{weather.current.is_day ? "روشن" : "شب"} · {weather.timezoneAbbreviation}</p>
+                  <p className="eyebrow">{weather.current.is_day ? "Day" : "Night"} · {weather.timezoneAbbreviation}</p>
                   <p className="temp">
                     {fmt(weather.current.temperature_2m, 1)}
                     <span>°C</span>
                   </p>
-                  <p className="condition">{weatherFa(weather.current.weather_code)}</p>
+                  <p className="condition">{weatherText(weather.current.weather_code)}</p>
                 </div>
                 <div className="hero-side">
-                  <p>احساس دما {fmt(weather.current.apparent_temperature, 1)}°</p>
+                  <p>Feels like {fmt(weather.current.apparent_temperature, 1)}°</p>
                   <p>
-                    امروز {fmt(weather.daily.temperature_2m_min[0], 0)}° تا {fmt(weather.daily.temperature_2m_max[0], 0)}°
+                    Today {fmt(weather.daily.temperature_2m_min[0], 0)}° to {fmt(weather.daily.temperature_2m_max[0], 0)}°
                   </p>
                   {anomaly != null && Number.isFinite(anomaly) && (
                     <p className={anomaly >= 0 ? "delta hot" : "delta cold"}>
-                      {fmtSigned(anomaly, 1)}° نسبت به میانگین {monthName(monthIndex)} در ۱۹۹۱–۲۰۰۰
+                      {fmtSigned(anomaly, 1)}° vs the {monthName(monthIndex)} mean for 1991–2000
                     </p>
                   )}
                   <div className="scale" aria-hidden="true">
@@ -393,47 +393,47 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="metric-grid" aria-label="پارامترهای لحظه‌ای">
-                <Metric label="رطوبت" value={fmt(weather.current.relative_humidity_2m, 0)} unit="درصد" />
-                <Metric label="نقطه شبنم" value={fmt(weather.current.dew_point_2m, 1)} unit="°C" />
-                <Metric label="فشار سطح دریا" value={fmt(weather.current.pressure_msl, 0)} unit="hPa" />
+              <section className="metric-grid" aria-label="Current parameters">
+                <Metric label="Humidity" value={fmt(weather.current.relative_humidity_2m, 0)} unit="%" />
+                <Metric label="Dew point" value={fmt(weather.current.dew_point_2m, 1)} unit="°C" />
+                <Metric label="Sea-level pressure" value={fmt(weather.current.pressure_msl, 0)} unit="hPa" />
                 <Metric
-                  label="باد"
+                  label="Wind"
                   value={fmt(weather.current.wind_speed_10m, 1)}
                   unit={`km/h ${windDir(weather.current.wind_direction_10m)}`}
-                  hint={`جهش ${fmt(weather.current.wind_gusts_10m, 0)}`}
+                  hint={`Gust ${fmt(weather.current.wind_gusts_10m, 0)}`}
                 />
-                <Metric label="بارش" value={fmt(weather.current.precipitation, 1)} unit="mm" />
-                <Metric label="ابرناکی" value={fmt(weather.current.cloud_cover, 0)} unit="درصد" />
-                <Metric label="دید" value={fmt(weather.current.visibility / 1000, 1)} unit="km" />
-                <Metric label="شاخص فرابنفش" value={fmt(weather.current.uv_index, 1)} unit={uvLabel(weather.current.uv_index)} />
-                <Metric label="کمبود فشار بخار" value={fmt(weather.current.vapour_pressure_deficit, 2)} unit="kPa" />
-                <Metric label="تبخیر-تعرق مرجع" value={fmt(weather.current.et0_fao_evapotranspiration, 2)} unit="mm" />
-                <Metric label="انرژی همرفتی" value={fmt(weather.current.cape, 0)} unit="J/kg" />
-                <Metric label="تابش موج کوتاه" value={fmt(weather.current.shortwave_radiation, 0)} unit="W/m²" />
+                <Metric label="Precipitation" value={fmt(weather.current.precipitation, 1)} unit="mm" />
+                <Metric label="Cloud cover" value={fmt(weather.current.cloud_cover, 0)} unit="%" />
+                <Metric label="Visibility" value={fmt(weather.current.visibility / 1000, 1)} unit="km" />
+                <Metric label="UV index" value={fmt(weather.current.uv_index, 1)} unit={uvLabel(weather.current.uv_index)} />
+                <Metric label="Vapor pressure deficit" value={fmt(weather.current.vapour_pressure_deficit, 2)} unit="kPa" />
+                <Metric label="Reference evapotranspiration" value={fmt(weather.current.et0_fao_evapotranspiration, 2)} unit="mm" />
+                <Metric label="Convective energy" value={fmt(weather.current.cape, 0)} unit="J/kg" />
+                <Metric label="Shortwave radiation" value={fmt(weather.current.shortwave_radiation, 0)} unit="W/m²" />
               </section>
 
               {air && airInfo && (
                 <section className="panel air">
                   <div className="section-title">
-                    <h3>کیفیت هوا</h3>
+                    <h3>Air quality</h3>
                     <span className={`pill ${airInfo.tone}`}>{airInfo.label}</span>
                   </div>
                   <div className="air-layout">
                     <div className="gauge-wrap">
                       <AqiGauge value={air.european_aqi} />
                       <p className="gauge-value">{fmt(air.european_aqi, 0)}</p>
-                      <p className="hint">شاخص اروپایی · آمریکایی {fmt(air.us_aqi, 0)}</p>
+                      <p className="hint">European index · US {fmt(air.us_aqi, 0)}</p>
                     </div>
                     <div className="metric-grid compact">
                       <Metric label="PM2.5" value={fmt(air.pm2_5, 1)} unit="µg/m³" />
                       <Metric label="PM10" value={fmt(air.pm10, 1)} unit="µg/m³" />
-                      <Metric label="ازون" value={fmt(air.ozone, 1)} unit="µg/m³" />
-                      <Metric label="دی‌اکسید نیتروژن" value={fmt(air.nitrogen_dioxide, 1)} unit="µg/m³" />
-                      <Metric label="دی‌اکسید گوگرد" value={fmt(air.sulphur_dioxide, 1)} unit="µg/m³" />
-                      <Metric label="مونوکسید کربن" value={fmt(air.carbon_monoxide, 0)} unit="µg/m³" />
-                      <Metric label="گردوغبار" value={fmt(air.dust, 1)} unit="µg/m³" />
-                      <Metric label="عمق نوری هواویز" value={fmt(air.aerosol_optical_depth, 2)} unit="AOD" />
+                      <Metric label="Ozone" value={fmt(air.ozone, 1)} unit="µg/m³" />
+                      <Metric label="Nitrogen dioxide" value={fmt(air.nitrogen_dioxide, 1)} unit="µg/m³" />
+                      <Metric label="Sulphur dioxide" value={fmt(air.sulphur_dioxide, 1)} unit="µg/m³" />
+                      <Metric label="Carbon monoxide" value={fmt(air.carbon_monoxide, 0)} unit="µg/m³" />
+                      <Metric label="Dust" value={fmt(air.dust, 1)} unit="µg/m³" />
+                      <Metric label="Aerosol optical depth" value={fmt(air.aerosol_optical_depth, 2)} unit="AOD" />
                     </div>
                   </div>
                 </section>
@@ -441,8 +441,8 @@ export default function App() {
 
               <section className="panel">
                 <div className="section-title">
-                  <h3>۲۴ ساعت آینده</h3>
-                  <span className="hint">خط دما · میله بارش</span>
+                  <h3>Next 24 hours</h3>
+                  <span className="hint">Temperature line · precipitation bars</span>
                 </div>
                 <HourRibbon temps={hours.map((hour) => hour.temp)} precips={hours.map((hour) => hour.precip)} />
                 <div className="hour-axis">
@@ -454,10 +454,10 @@ export default function App() {
 
               <section className="panel">
                 <div className="section-title">
-                  <h3>هفت روز</h3>
+                  <h3>Seven days</h3>
                   <span className="legend">
-                    <i className="swatch copper" /> بیشینه
-                    <i className="swatch ice" /> کمینه
+                    <i className="swatch copper" /> High
+                    <i className="swatch ice" /> Low
                   </span>
                 </div>
                 <WeekChart maxes={weather.daily.temperature_2m_max} mins={weather.daily.temperature_2m_min} />
@@ -465,15 +465,15 @@ export default function App() {
                   {weather.daily.time.map((day, index) => (
                     <article key={day}>
                       <strong>{weekdayIso(day)}</strong>
-                      <span>{weatherFa(weather.daily.weather_code[index])}</span>
+                      <span>{weatherText(weather.daily.weather_code[index])}</span>
                       <b>
                         {fmt(weather.daily.temperature_2m_max[index], 0)}° / {fmt(weather.daily.temperature_2m_min[index], 0)}°
                       </b>
                       <em>
-                        بارش {fmt(weather.daily.precipitation_sum[index], 1)} mm · احتمال {fmt(weather.daily.precipitation_probability_max[index], 0)}٪
+                        Rain {fmt(weather.daily.precipitation_sum[index], 1)} mm · chance {fmt(weather.daily.precipitation_probability_max[index], 0)}%
                       </em>
                       <em>
-                        باد {fmt(weather.daily.wind_speed_10m_max[index], 0)} · UV {fmt(weather.daily.uv_index_max[index], 0)} · ET₀ {fmt(weather.daily.et0_fao_evapotranspiration[index], 1)}
+                        Wind {fmt(weather.daily.wind_speed_10m_max[index], 0)} · UV {fmt(weather.daily.uv_index_max[index], 0)} · ET₀ {fmt(weather.daily.et0_fao_evapotranspiration[index], 1)}
                       </em>
                     </article>
                   ))}
@@ -484,34 +484,34 @@ export default function App() {
 
           <section className="panel">
             <div className="section-title">
-              <h3>چشم‌انداز اقلیمی</h3>
-              <span className="hint">میانگین سه مدل HighResMIP</span>
+              <h3>Climate outlook</h3>
+              <span className="hint">Mean of three HighResMIP models</span>
             </div>
             {climateState === "loading" && <div className="skeleton climate-skeleton" />}
-            {climateState === "error" && <p className="inline-error">سری مدل اقلیمی برای این نقطه بارگذاری نشد.</p>}
+            {climateState === "error" && <p className="inline-error">The climate-model series failed to load for this point.</p>}
             {climate && climateState === "ready" && (
               <>
                 <div className="delta-row">
                   <article>
-                    <p>تغییر دمای سالانه</p>
+                    <p>Annual temperature change</p>
                     <strong className={tempDelta != null && tempDelta >= 0 ? "hot" : "cold"}>{fmtSigned(tempDelta, 2)}°C</strong>
                     <span>
-                      {fmt(climate.baseline.annualTemp, 1)}° در ۱۹۹۱–۲۰۰۰ به {fmt(climate.future.annualTemp, 1)}° در ۲۰۴۱–۲۰۵۰
+                      {fmt(climate.baseline.annualTemp, 1)}° in 1991–2000 to {fmt(climate.future.annualTemp, 1)}° in 2041–2050
                     </span>
                   </article>
                   <article>
-                    <p>تغییر بارش سالانه</p>
-                    <strong>{fmtSigned(precipDelta, 1)}٪</strong>
+                    <p>Annual precipitation change</p>
+                    <strong>{fmtSigned(precipDelta, 1)}%</strong>
                     <span>
-                      {fmt(climate.baseline.annualPrecip, 0)} به {fmt(climate.future.annualPrecip, 0)} میلی‌متر
+                      {fmt(climate.baseline.annualPrecip, 0)} to {fmt(climate.future.annualPrecip, 0)} mm
                     </span>
                   </article>
                 </div>
                 <div className="section-title tight">
-                  <h3>دمای میانگین ماهانه</h3>
+                  <h3>Monthly mean temperature</h3>
                   <span className="legend">
-                    <i className="swatch ice" /> ۱۹۹۱–۲۰۰۰
-                    <i className="swatch copper" /> ۲۰۴۱–۲۰۵۰
+                    <i className="swatch ice" /> 1991–2000
+                    <i className="swatch copper" /> 2041–2050
                   </span>
                 </div>
                 <ClimateLines
@@ -520,9 +520,9 @@ export default function App() {
                   low={climate.future.tempLow}
                   high={climate.future.tempHigh}
                 />
-                <p className="hint">نوار مسی، دامنه سه مدل در دوره آینده است.</p>
+                <p className="hint">The copper band is the spread across the three models in the future period.</p>
                 <div className="section-title tight">
-                  <h3>بارش ماهانه</h3>
+                  <h3>Monthly precipitation</h3>
                 </div>
                 <PrecipBars baseline={climate.baseline.precip} future={climate.future.precip} />
                 <div className="models">
@@ -532,13 +532,13 @@ export default function App() {
                     return (
                       <p key={model.label}>
                         <strong>{model.label}</strong>
-                        <span>{fmtSigned(delta, 2)}°C دما · بارش آینده {fmt(model.annualPrecip, 0)} mm</span>
+                        <span>{fmtSigned(delta, 2)}°C temperature · future rain {fmt(model.annualPrecip, 0)} mm</span>
                       </p>
                     )
                   })}
                 </div>
                 <p className="disclaimer">
-                  این اعداد میانگین یاخته مدل هستند، نه مشاهده ایستگاهی. مدل‌ها از مجموعه HighResMIP تا سال ۲۰۵۰ هستند و جایگزین سناریوهای CMIP6 یا گزارش IPCC برای تصمیم رسمی نیستند.
+                  These values are model-grid means, not station observations. The models are HighResMIP runs through 2050 and are not a substitute for CMIP6 scenarios or the IPCC reports when making official decisions.
                 </p>
               </>
             )}
@@ -547,8 +547,8 @@ export default function App() {
           {flood && (
             <section className="panel">
               <div className="section-title">
-                <h3>دبی رودخانه</h3>
-                <span className="hint">GloFAS · نزدیک‌ترین آبراهه</span>
+                <h3>River discharge</h3>
+                <span className="hint">GloFAS · nearest watercourse</span>
               </div>
               <div className="days flood">
                 {flood.time.map((day, index) => (
@@ -563,18 +563,18 @@ export default function App() {
           )}
 
           <section className="panel about">
-            <h3>درباره اقلیم‌نما</h3>
+            <h3>About ClimaScope</h3>
             <p>
-              ابزار میدانی برای متخصصان تغییر اقلیم: وضعیت لحظه‌ای جو، آلاینده‌ها، تبخیر-تعرق، دبی رودخانه و مقایسه اقلیم مدل بین دو دهه.
+              A field tool for climate specialists: live atmosphere, pollutants, evapotranspiration, river discharge, and a two-decade model comparison.
             </p>
             <div className="developer">
-              <p>سازنده و توسعه‌دهنده</p>
+              <p>Developer</p>
               <a href={`mailto:${DEVELOPER_EMAIL}`}>{DEVELOPER_EMAIL}</a>
             </div>
             <p className="hint">
-              منابع: Open-Meteo برای پیش‌بینی، کیفیت هوا، مدل اقلیمی و سیل؛ global-warming.org برای CO₂، متان، N₂O، ناهنجاری GISS و یخ دریا؛ نقشه پایه Esri.
+              Sources: Open-Meteo for forecast, air quality, climate models, and flood; global-warming.org for CO₂, methane, N₂O, the GISS anomaly, and sea ice; Esri basemap.
             </p>
-            <p className="hint">نسخه ۱.۰.۰</p>
+            <p className="hint">Version 1.0.0</p>
           </section>
         </main>
       </div>

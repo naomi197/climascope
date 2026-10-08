@@ -1,6 +1,6 @@
 {
-  "appId": "com.alirezafazeli.eghlimnama",
-  "appName": "اقلیم‌نما",
+  "appId": "com.alirezafazeli.climascope",
+  "appName": "ClimaScope",
   "webDir": "dist",
   "backgroundColor": "#07131a",
   "android": {

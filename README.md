@@ -1,33 +1,33 @@
-# اقلیم‌نما
+# ClimaScope
 
-رصدخانه همراه برای متخصصان تغییر اقلیم. وضعیت جو، کیفیت هوا، تبخیر-تعرق، دبی رودخانه و چشم‌انداز مدل‌های اقلیمی را برای هر نقطه از زمین نشان می‌دهد.
+A field observatory for climate specialists. It shows the live atmosphere, air quality, evapotranspiration, river discharge, and a climate-model outlook for any point on Earth.
 
-سازنده و توسعه‌دهنده: [alirezafazeli@live.cim](mailto:alirezafazeli@live.cim)
+Developer: [alirezafazeli@live.com](mailto:alirezafazeli@live.com)
 
-## اجرا در مرورگر
+## Run in the browser
 
 ```bash
 npm install
 npm run dev
 ```
 
-سپس نشانی [http://127.0.0.1:47231](http://127.0.0.1:47231) را باز کنید.
+Then open [http://127.0.0.1:47231](http://127.0.0.1:47231).
 
-## ساخت APK
+## Build the APK
 
-خروجی آماده در `release/EghlimNama.apk` است. برای ساخت دوباره، JDK ۲۱ و Android SDK (سطح API ۳۶) لازم است:
+The installable file is `release/ClimaScope.apk`. To rebuild it you need JDK 21 and Android SDK API 36:
 
 ```bash
 export ANDROID_HOME="$HOME/android-sdk"
 npm run apk
 ```
 
-فایل امضاشده در `android/app/build/outputs/apk/release/` ساخته می‌شود. رمز کلید محلی ساخت در `android/keystore.properties` است و فقط برای نصب همین نسخه به کار می‌رود.
+The signed APK is written to `android/app/build/outputs/apk/release/`. The local signing password lives in `android/keystore.properties` and is only for installing this build.
 
-## داده
+## Data
 
-- پیش‌بینی، کیفیت هوا، مدل اقلیمی و دبی: [Open-Meteo](https://open-meteo.com/)
-- CO₂، متان، N₂O، ناهنجاری دمای GISS و یخ دریا: [global-warming.org](https://global-warming.org/)
-- نقشه: Esri World Dark Gray
+- Forecast, air quality, climate models, and river discharge: [Open-Meteo](https://open-meteo.com/)
+- CO₂, methane, N₂O, the GISS temperature anomaly, and sea ice: [global-warming.org](https://global-warming.org/)
+- Map: Esri World Dark Gray
 
-مقایسه اقلیمی، میانگین سه مدل HighResMIP بین ۱۹۹۱–۲۰۰۰ و ۲۰۴۱–۲۰۵۰ است و جایگزین سناریوهای CMIP6 یا گزارش IPCC برای تصمیم رسمی نیست.
+The climate comparison is the mean of three HighResMIP models for 1991–2000 versus 2041–2050. It is not a substitute for CMIP6 scenarios or the IPCC reports.

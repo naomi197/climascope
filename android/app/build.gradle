@@ -7,7 +7,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.alirezafazeli.eghlimnama"
+    namespace = "com.alirezafazeli.climascope"
     compileSdk = rootProject.ext.compileSdkVersion
     signingConfigs {
         release {
@@ -20,7 +20,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.alirezafazeli.eghlimnama"
+        applicationId "com.alirezafazeli.climascope"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

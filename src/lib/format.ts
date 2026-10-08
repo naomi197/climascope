@@ -1,26 +1,26 @@
-export const DEVELOPER_EMAIL = "alirezafazeli@live.cim"
+export const DEVELOPER_EMAIL = "alirezafazeli@live.com"
 
 const MONTHS = [
-  "ژانویه",
-  "فوریه",
-  "مارس",
-  "آوریل",
-  "مه",
-  "ژوئن",
-  "ژوئیه",
-  "اوت",
-  "سپتامبر",
-  "اکتبر",
-  "نوامبر",
-  "دسامبر",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
-const WEEKDAYS = ["یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"]
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 export function fmt(n: number | null | undefined, digits = 1): string {
   if (n == null || !Number.isFinite(n)) return "—"
   const d = Math.abs(n) >= 100 ? 0 : digits
-  return new Intl.NumberFormat("fa-IR", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: d,
     minimumFractionDigits: d,
   }).format(n)
@@ -52,15 +52,15 @@ export function labelDecimalYear(value: string): string {
   if (!Number.isFinite(n)) return value
   const year = Math.floor(n)
   const month = Math.min(12, Math.max(1, Math.round((n - year) * 12)))
-  return `${MONTHS[month - 1]} ${new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(year)}`
+  return `${MONTHS[month - 1]} ${year}`
 }
 
 export function labelYearMonth(year: number, month: number): string {
-  return `${MONTHS[month - 1] ?? ""} ${new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(year)}`
+  return `${MONTHS[month - 1] ?? ""} ${year}`
 }
 
 export function labelYmd(year: string, month: string, day: string): string {
-  return `${Number(day)} ${MONTHS[Number(month) - 1] ?? ""} ${new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(Number(year))}`
+  return `${Number(day)} ${MONTHS[Number(month) - 1] ?? ""} ${Number(year)}`
 }
 
 export function labelIsoDate(iso: string): string {
@@ -78,70 +78,70 @@ export function hourLabel(iso: string): string {
 }
 
 export function coordPair(lat: number, lon: number): string {
-  const ns = lat >= 0 ? "شمالی" : "جنوبی"
-  const ew = lon >= 0 ? "شرقی" : "غربی"
+  const ns = lat >= 0 ? "N" : "S"
+  const ew = lon >= 0 ? "E" : "W"
   return `${Math.abs(lat).toFixed(3)}° ${ns} · ${Math.abs(lon).toFixed(3)}° ${ew}`
 }
 
-export function weatherFa(code: number): string {
+export function weatherText(code: number): string {
   const table: Record<number, string> = {
-    0: "آسمان صاف",
-    1: "عمدتاً صاف",
-    2: "نیمه‌ابری",
-    3: "ابری",
-    45: "مه",
-    48: "مه یخی",
-    51: "نم‌نم باران",
-    53: "باران ریز",
-    55: "باران ریز شدید",
-    56: "نم‌نم یخی",
-    57: "باران یخی",
-    61: "باران ملایم",
-    63: "باران",
-    65: "باران شدید",
-    66: "باران یخی ملایم",
-    67: "باران یخی شدید",
-    71: "برف ملایم",
-    73: "برف",
-    75: "برف شدید",
-    77: "دانه برف",
-    80: "رگبار",
-    81: "رگبار متوسط",
-    82: "رگبار شدید",
-    85: "رگبار برف",
-    86: "رگبار برف شدید",
-    95: "رعدوبرق",
-    96: "رعدوبرق با تگرگ",
-    99: "رعدوبرق شدید",
+    0: "Clear",
+    1: "Mostly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Rime fog",
+    51: "Light drizzle",
+    53: "Drizzle",
+    55: "Heavy drizzle",
+    56: "Freezing drizzle",
+    57: "Heavy freezing drizzle",
+    61: "Light rain",
+    63: "Rain",
+    65: "Heavy rain",
+    66: "Light freezing rain",
+    67: "Heavy freezing rain",
+    71: "Light snow",
+    73: "Snow",
+    75: "Heavy snow",
+    77: "Snow grains",
+    80: "Rain showers",
+    81: "Moderate showers",
+    82: "Violent showers",
+    85: "Snow showers",
+    86: "Heavy snow showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with hail",
+    99: "Severe thunderstorm",
   }
-  return table[code] ?? "شرایط متغیر"
+  return table[code] ?? "Variable"
 }
 
 export function windDir(deg: number): string {
-  const dirs = ["شمال", "شمال‌شرقی", "شرق", "جنوب‌شرقی", "جنوب", "جنوب‌غربی", "غرب", "شمال‌غربی"]
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
   return dirs[Math.round(deg / 45) % 8] ?? "—"
 }
 
 export function aqiTone(aqi: number): { label: string; tone: string } {
-  if (aqi <= 20) return { label: "پاک", tone: "good" }
-  if (aqi <= 40) return { label: "قابل قبول", tone: "fair" }
-  if (aqi <= 60) return { label: "متوسط", tone: "mid" }
-  if (aqi <= 80) return { label: "ناسالم", tone: "poor" }
-  if (aqi <= 100) return { label: "بسیار ناسالم", tone: "bad" }
-  return { label: "خطرناک", tone: "worse" }
+  if (aqi <= 20) return { label: "Good", tone: "good" }
+  if (aqi <= 40) return { label: "Fair", tone: "fair" }
+  if (aqi <= 60) return { label: "Moderate", tone: "mid" }
+  if (aqi <= 80) return { label: "Poor", tone: "poor" }
+  if (aqi <= 100) return { label: "Very poor", tone: "bad" }
+  return { label: "Extremely poor", tone: "worse" }
 }
 
 export function uvLabel(uv: number): string {
-  if (uv < 3) return "کم"
-  if (uv < 6) return "متوسط"
-  if (uv < 8) return "زیاد"
-  if (uv < 11) return "خیلی زیاد"
-  return "شدید"
+  if (uv < 3) return "Low"
+  if (uv < 6) return "Moderate"
+  if (uv < 8) return "High"
+  if (uv < 11) return "Very high"
+  return "Extreme"
 }
 
 export function localClock(timeZone: string, date = new Date()): string {
   try {
-    return new Intl.DateTimeFormat("fa-IR", {
+    return new Intl.DateTimeFormat("en-GB", {
       timeZone,
       weekday: "long",
       day: "numeric",

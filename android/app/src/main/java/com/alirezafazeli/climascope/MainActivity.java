@@ -1,4 +1,4 @@
-package com.alirezafazeli.eghlimnama;
+package com.alirezafazeli.climascope;
 
 import com.getcapacitor.BridgeActivity;
 
