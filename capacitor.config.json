@@ -1,0 +1,14 @@
+{
+  "appId": "com.alirezafazeli.eghlimnama",
+  "appName": "اقلیم‌نما",
+  "webDir": "dist",
+  "backgroundColor": "#07131a",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
