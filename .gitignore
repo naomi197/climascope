@@ -28,3 +28,6 @@ android/keystore
 *.njsproj
 *.sln
 *.sw?
+
+android/eghlimnama.jks
+android/keystore.properties

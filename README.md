@@ -28,6 +28,6 @@ npm run apk
 
 - پیش‌بینی، کیفیت هوا، مدل اقلیمی و دبی: [Open-Meteo](https://open-meteo.com/)
 - CO₂، متان، N₂O، ناهنجاری دمای GISS و یخ دریا: [global-warming.org](https://global-warming.org/)
-- نقشه: OpenStreetMap و CARTO
+- نقشه: Esri World Dark Gray
 
 مقایسه اقلیمی، میانگین سه مدل HighResMIP بین ۱۹۹۱–۲۰۰۰ و ۲۰۴۱–۲۰۵۰ است و جایگزین سناریوهای CMIP6 یا گزارش IPCC برای تصمیم رسمی نیست.

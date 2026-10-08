@@ -272,7 +272,7 @@ export default function App() {
               <input
                 id="place-search"
                 value={query}
-                placeholder="تهران، داکا، یا 35.69, 51.42"
+                placeholder="نام شهر یا کشور"
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
               />
@@ -394,7 +394,7 @@ export default function App() {
               </section>
 
               <section className="metric-grid" aria-label="پارامترهای لحظه‌ای">
-                <Metric label="رطوبت" value={fmt(weather.current.relative_humidity_2m, 0)} unit="٪" />
+                <Metric label="رطوبت" value={fmt(weather.current.relative_humidity_2m, 0)} unit="درصد" />
                 <Metric label="نقطه شبنم" value={fmt(weather.current.dew_point_2m, 1)} unit="°C" />
                 <Metric label="فشار سطح دریا" value={fmt(weather.current.pressure_msl, 0)} unit="hPa" />
                 <Metric
@@ -404,7 +404,7 @@ export default function App() {
                   hint={`جهش ${fmt(weather.current.wind_gusts_10m, 0)}`}
                 />
                 <Metric label="بارش" value={fmt(weather.current.precipitation, 1)} unit="mm" />
-                <Metric label="ابرناکی" value={fmt(weather.current.cloud_cover, 0)} unit="٪" />
+                <Metric label="ابرناکی" value={fmt(weather.current.cloud_cover, 0)} unit="درصد" />
                 <Metric label="دید" value={fmt(weather.current.visibility / 1000, 1)} unit="km" />
                 <Metric label="شاخص فرابنفش" value={fmt(weather.current.uv_index, 1)} unit={uvLabel(weather.current.uv_index)} />
                 <Metric label="کمبود فشار بخار" value={fmt(weather.current.vapour_pressure_deficit, 2)} unit="kPa" />
@@ -572,7 +572,7 @@ export default function App() {
               <a href={`mailto:${DEVELOPER_EMAIL}`}>{DEVELOPER_EMAIL}</a>
             </div>
             <p className="hint">
-              منابع: Open-Meteo برای پیش‌بینی، کیفیت هوا، مدل اقلیمی و سیل؛ global-warming.org برای CO₂، متان، N₂O، ناهنجاری GISS و یخ دریا؛ نقشه از OpenStreetMap و CARTO.
+              منابع: Open-Meteo برای پیش‌بینی، کیفیت هوا، مدل اقلیمی و سیل؛ global-warming.org برای CO₂، متان، N₂O، ناهنجاری GISS و یخ دریا؛ نقشه پایه Esri.
             </p>
             <p className="hint">نسخه ۱.۰.۰</p>
           </section>
