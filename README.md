@@ -2,9 +2,17 @@
 
 ## Android Climate Observatory
 
-ClimaScope is an English-language Android application for climate specialists who need live climate parameters anywhere on Earth. The same interface also runs in the browser.
+[![Live observatory](https://img.shields.io/badge/Live-naomi197.github.io%2Fclimascope-0b3a36?style=for-the-badge)](https://naomi197.github.io/climascope/)
+[![APK](https://img.shields.io/badge/Download-ClimaScope.apk-1d4e89?style=for-the-badge)](https://github.com/naomi197/climascope/releases/latest/download/ClimaScope.apk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2a2f33?style=for-the-badge)](LICENSE)
+
+ClimaScope is an English-language Android application for climate specialists who need live climate parameters anywhere on Earth. The same observatory runs in the browser.
 
 Developer: [alirezafazeli@live.com](mailto:alirezafazeli@live.com)
+
+<p align="center">
+  <img src="docs/preview.png" alt="ClimaScope showing global greenhouse-gas indicators and a live station" width="920" />
+</p>
 
 ### Features
 
@@ -32,7 +40,9 @@ The climate comparison is a model-grid mean. It is not a substitute for CMIP6 sc
 
 ### Setup
 
-1. Clone the repository:
+1. Open the live observatory: https://naomi197.github.io/climascope/
+2. Or install the signed APK from [Releases](https://github.com/naomi197/climascope/releases/latest). Copy `ClimaScope.apk` to the phone and allow install from unknown sources.
+3. To run the source locally:
 
 ```bash
 git clone https://github.com/naomi197/climascope.git
@@ -41,8 +51,7 @@ npm install
 npm run dev
 ```
 
-2. Open http://127.0.0.1:47231
-3. To install on Android, download `release/ClimaScope.apk`, copy it to the phone, and allow install from unknown sources.
+4. Open http://127.0.0.1:47231
 
 ### Rebuild the APK
 
@@ -53,7 +62,7 @@ export ANDROID_HOME="$HOME/android-sdk"
 npm run apk
 ```
 
-The signed file is written to `android/app/build/outputs/apk/release/`.
+The signed file is written to `android/app/build/outputs/apk/release/`. A copy for direct install is kept at `release/ClimaScope.apk`.
 
 ### Project Structure
 

@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: ClimaScope
+message: If you use ClimaScope, please cite it as below.
+type: software
+authors:
+  - family-names: Sani
+    given-names: Alireza
+    email: alirezafazeli@live.com
+repository-code: "https://github.com/naomi197/climascope"
+url: "https://naomi197.github.io/climascope/"
+license: MIT
+version: 1.0.0
+date-released: "2026-10-09"
+keywords:
+  - climate
+  - air quality
+  - android
+  - open-meteo
+  - highresmip
