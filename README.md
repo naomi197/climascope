@@ -71,6 +71,7 @@ src/
 ├── components/     # Map and charts
 ├── lib/            # Climate APIs, formatting, and model summaries
 android/            # Capacitor Android project
+fastlane/           # F-Droid listing text and images
 release/            # Signed ClimaScope.apk
 ```
 

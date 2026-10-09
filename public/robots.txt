@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naomi197.github.io/climascope/sitemap.xml

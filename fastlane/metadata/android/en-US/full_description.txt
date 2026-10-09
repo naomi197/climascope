@@ -1,0 +1,7 @@
+ClimaScope is an English climate observatory for specialists who need live parameters anywhere on Earth. The same interface runs as an Android app and in the browser.
+
+It shows global carbon dioxide, methane, nitrous oxide, the GISS temperature anomaly, and sea ice. For any city or coordinate it shows temperature, humidity, wind, pressure, radiation, evapotranspiration, and UV, plus air quality (PM2.5, PM10, ozone, dust, and the European and US indexes), a 24-hour and 7-day outlook, and GloFAS river discharge.
+
+A 1991–2000 versus 2041–2050 comparison uses three HighResMIP models. That comparison is a model-grid mean. It is not a substitute for CMIP6 scenarios or the IPCC reports when making an official decision.
+
+Data comes from Open-Meteo, global-warming.org, and the Esri World Dark Gray basemap. No account and no API key are required.
