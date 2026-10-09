@@ -8,7 +8,7 @@
 
 ClimaScope is an English-language Android application for climate specialists who need live climate parameters anywhere on Earth. The same observatory runs in the browser.
 
-Developer: [alirezafazeli@live.com](mailto:alirezafazeli@live.com)
+Developer: Alireza Sani · [alirezafazeli@live.com](mailto:alirezafazeli@live.com)
 
 <p align="center">
   <img src="docs/preview.png" alt="ClimaScope showing global greenhouse-gas indicators and a live station" width="920" />
