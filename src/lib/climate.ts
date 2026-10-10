@@ -67,11 +67,16 @@ export function summarizePeriod(
 
   const temp = Array.from({ length: 12 }, (_, month) => avg(perModel.map((model) => model.temp[month]).filter(finite)))
   const precip = Array.from({ length: 12 }, (_, month) => avg(perModel.map((model) => model.precip[month]).filter(finite)))
+  const band = (month: number, pick: "min" | "max") => {
+    const values = perModel.map((model) => model.temp[month]).filter(finite)
+    if (!values.length) return Number.NaN
+    return pick === "min" ? Math.min(...values) : Math.max(...values)
+  }
 
   return {
     temp,
-    tempLow: Array.from({ length: 12 }, (_, month) => Math.min(...perModel.map((model) => model.temp[month]).filter(finite))),
-    tempHigh: Array.from({ length: 12 }, (_, month) => Math.max(...perModel.map((model) => model.temp[month]).filter(finite))),
+    tempLow: Array.from({ length: 12 }, (_, month) => band(month, "min")),
+    tempHigh: Array.from({ length: 12 }, (_, month) => band(month, "max")),
     precip,
     annualTemp: avg(perModel.map((model) => model.annualTemp).filter(finite)),
     annualPrecip: avg(perModel.map((model) => model.annualPrecip).filter(finite)),

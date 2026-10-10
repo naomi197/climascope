@@ -9,8 +9,8 @@ authors:
 repository-code: "https://github.com/naomi197/climascope"
 url: "https://naomi197.github.io/climascope/"
 license: MIT
-version: 1.0.0
-date-released: "2026-10-09"
+version: 1.1.0
+date-released: "2026-10-10"
 keywords:
   - climate
   - air quality

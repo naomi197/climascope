@@ -1,0 +1,20 @@
+name: Station report
+description: A place, series, or map point that does not match what you expected.
+title: "[Station] "
+labels: ["station"]
+body:
+  - type: input
+    id: place
+    attributes:
+      label: Place
+      description: City or coordinates.
+      placeholder: "Tehran, or 35.69, 51.42"
+    validations:
+      required: true
+  - type: textarea
+    id: saw
+    attributes:
+      label: What you saw
+      description: Which figure or parameter looked wrong, and what you expected.
+    validations:
+      required: true

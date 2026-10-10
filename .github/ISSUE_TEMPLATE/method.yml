@@ -1,0 +1,12 @@
+name: Method note
+description: A question or correction about the HighResMIP reduction.
+title: "[Method] "
+labels: ["method"]
+body:
+  - type: textarea
+    id: note
+    attributes:
+      label: Note
+      description: Which decade, model, or step in docs/METHOD.md you are asking about.
+    validations:
+      required: true

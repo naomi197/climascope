@@ -1,0 +1,1 @@
+ClimaScope 1.1.0 is a station bulletin. The sheet opens on Dhaka, with Jakarta, Manaus, Malé, and Nuuk as the reference stations. The HighResMIP comparison is now a reusable ensemble, with the method on its own tab. The paper background is textured, and the charts stay flat.

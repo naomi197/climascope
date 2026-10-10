@@ -86,22 +86,13 @@ export type GlobalIndicators = {
   ice: { extent: number; anomaly: number; when: string; trend: number; series: number[] }
 }
 
+/** Cities where a climate signal is already decisive: flood, sea level, rainforest, and Arctic ice. */
 export const PRESETS: Place[] = [
-  { name: "Tehran", admin: "Tehran Province", country: "Iran", latitude: 35.69439, longitude: 51.42151 },
-  { name: "Ahvaz", admin: "Khuzestan", country: "Iran", latitude: 31.3183, longitude: 48.6706 },
-  { name: "Bandar Abbas", admin: "Hormozgan", country: "Iran", latitude: 27.1832, longitude: 56.2666 },
-  { name: "Rasht", admin: "Gilan", country: "Iran", latitude: 37.2808, longitude: 49.5832 },
-  { name: "Tabriz", admin: "East Azerbaijan", country: "Iran", latitude: 38.08, longitude: 46.2919 },
-  { name: "Mashhad", admin: "Razavi Khorasan", country: "Iran", latitude: 36.2605, longitude: 59.6168 },
-  { name: "Dubai", country: "United Arab Emirates", latitude: 25.2048, longitude: 55.2708 },
-  { name: "Dhaka", country: "Bangladesh", latitude: 23.8103, longitude: 90.4125 },
-  { name: "Male", country: "Maldives", latitude: 4.1755, longitude: 73.5093 },
-  { name: "Manaus", country: "Brazil", latitude: -3.119, longitude: -60.0217 },
-  { name: "Nuuk", country: "Greenland", latitude: 64.1814, longitude: -51.6941 },
-  { name: "Arctic Ocean", latitude: 85, longitude: 15 },
-  { name: "London", country: "United Kingdom", latitude: 51.5072, longitude: -0.1276 },
-  { name: "Tokyo", country: "Japan", latitude: 35.6762, longitude: 139.6503 },
-  { name: "Sydney", country: "Australia", latitude: -33.8688, longitude: 151.2093 },
+  { name: "Dhaka", admin: "Dhaka Division", country: "Bangladesh", latitude: 23.8103, longitude: 90.4125 },
+  { name: "Jakarta", admin: "Jakarta", country: "Indonesia", latitude: -6.2088, longitude: 106.8456 },
+  { name: "Manaus", admin: "Amazonas", country: "Brazil", latitude: -3.119, longitude: -60.0217 },
+  { name: "Malé", admin: "Kaafu", country: "Maldives", latitude: 4.1755, longitude: 73.5093 },
+  { name: "Nuuk", admin: "Sermersooq", country: "Greenland", latitude: 64.1814, longitude: -51.6941 },
 ]
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {

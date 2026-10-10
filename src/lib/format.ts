@@ -139,6 +139,19 @@ export function uvLabel(uv: number): string {
   return "Extreme"
 }
 
+export function utcStamp(date = new Date()): string {
+  const stamp = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date)
+  return `${stamp} UTC`
+}
+
 export function localClock(timeZone: string, date = new Date()): string {
   try {
     return new Intl.DateTimeFormat("en-GB", {
