@@ -2,7 +2,7 @@
   "appId": "com.alirezafazeli.climascope",
   "appName": "ClimaScope",
   "webDir": "dist",
-  "backgroundColor": "#e5e0d4",
+  "backgroundColor": "#e4edf3",
   "android": {
     "allowMixedContent": false
   },

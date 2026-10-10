@@ -40,7 +40,7 @@ export function ObserveMap({
       <CircleMarker
         center={[lat, lon]}
         radius={9}
-        pathOptions={{ color: "#17211c", weight: 2, fillColor: "#9a4e24", fillOpacity: 1 }}
+        pathOptions={{ color: "#0c304e", weight: 2, fillColor: "#2ec4b6", fillOpacity: 1 }}
       />
     </MapContainer>
   )

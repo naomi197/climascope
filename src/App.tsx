@@ -36,8 +36,10 @@ import {
   uvLabel,
   weatherText,
   weekdayIso,
+  setActiveLang,
   windDir,
 } from "./lib/format.ts"
+import { COPY, localizePlace, type Lang } from "./lib/copy.ts"
 import { stationOutlook } from "./lib/outlook.ts"
 
 const DEFAULT_PLACE: Place = PRESETS[0]
@@ -46,10 +48,10 @@ const REFERENCE = PRESETS.slice(0, 5)
 function Mark() {
   return (
     <svg className="mark" viewBox="0 0 48 48" aria-hidden="true">
-      <rect x="1" y="1" width="46" height="46" fill="none" stroke="#f4efe4" strokeWidth="1" />
-      <circle cx="24" cy="24" r="14" fill="none" stroke="#f4efe4" strokeWidth="1.1" />
-      <path d="M24 8v32M10 24h28" fill="none" stroke="#f4efe4" strokeWidth="0.8" />
-      <path d="M14 30c4-7 7-5 10-9 3-4 6-2 10 1" fill="none" stroke="#c47a45" strokeWidth="1.4" />
+      <rect x="1" y="1" width="46" height="46" fill="none" stroke="#d6e6f2" strokeWidth="1" />
+      <circle cx="24" cy="24" r="14" fill="none" stroke="#d6e6f2" strokeWidth="1.1" />
+      <path d="M24 8v32M10 24h28" fill="none" stroke="#d6e6f2" strokeWidth="0.8" />
+      <path d="M14 30c4-7 7-5 10-9 3-4 6-2 10 1" fill="none" stroke="#5ec8e6" strokeWidth="1.4" />
     </svg>
   )
 }
@@ -81,6 +83,14 @@ export default function App() {
   const [now, setNow] = useState(() => Date.now())
   const [reload, setReload] = useState(0)
   const [desk, setDesk] = useState<"briefing" | "method">("briefing")
+  const [lang, setLang] = useState<Lang>("en")
+  setActiveLang(lang)
+  const t = COPY[lang]
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === "fa" ? "rtl" : "ltr"
+  }, [lang])
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000)
@@ -177,14 +187,14 @@ export default function App() {
       const permission = await Geolocation.requestPermissions()
       const granted = permission.location === "granted" || permission.coarseLocation === "granted"
       if (!granted && permission.location !== "prompt") {
-        setNotice("Location permission was denied.")
+        setNotice(COPY[lang].locationDenied)
         return
       }
       const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 12000 })
       await chooseMap(position.coords.latitude, position.coords.longitude)
       setNotice(null)
     } catch {
-      setNotice("Current location is unavailable. Search for a city or enter coordinates.")
+      setNotice(COPY[lang].locationUnavailable)
     }
   }
 
@@ -198,6 +208,7 @@ export default function App() {
     setReload((value) => value + 1)
   }
 
+  const shown = localizePlace(place, lang)
   const hours = useMemo(() => (weather ? nextHours(weather) : []), [weather])
   const clock = weather ? localClock(weather.timezone, new Date(now)) : ""
   const shownResults = query.trim().length < 2 ? [] : results
@@ -215,34 +226,42 @@ export default function App() {
   const n2oWhen = globals ? labelYearMonth(parseDecimalMonth(globals.nitrous.when).year, parseDecimalMonth(globals.nitrous.when).month) : ""
 
   return (
-    <div className="folio">
+    <div className="folio" lang={lang} dir={lang === "fa" ? "rtl" : "ltr"}>
       <header className="mast">
         <div className="mast-brand">
           <Mark />
           <div>
-            <p className="running">Climate observatory · HighResMIP grid means</p>
+            <p className="running">{t.running}</p>
             <h1>ClimaScope</h1>
           </div>
         </div>
         <div className="mast-side">
+          <div className="lang-switch" role="group" aria-label={t.language}>
+            <button type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>
+              EN
+            </button>
+            <button type="button" aria-pressed={lang === "fa"} onClick={() => setLang("fa")}>
+              فا
+            </button>
+          </div>
           <p>{utcStamp(new Date(now))}</p>
-          <p>Open-Meteo · GloFAS · global-warming.org</p>
+          <p>{t.sources}</p>
         </div>
       </header>
-      <p className="deck">A station briefing for any point on Earth: the live atmosphere, the air column, river discharge, and a three-model decade comparison.</p>
+      <p className="deck">{t.deck}</p>
 
       <div className="pulse-scroll">
-      <section className="pulse" aria-label="Global indicators">
-        {globalState === "error" && <p className="inline-error">Global indicators are unavailable right now.</p>}
+      <section className="pulse" aria-label={t.globals}>
+        {globalState === "error" && <p className="inline-error">{t.globalsError}</p>}
         {globalState === "loading" &&
           Array.from({ length: 5 }, (_, index) => <div key={index} className="pulse-card skeleton" />)}
         {globals && (
           <>
-            <PulseCard kicker="Carbon dioxide" value={fmt(globals.co2.value, 2)} unit="ppm trend" note={`cycle ${fmt(globals.co2.cycle, 1)} · ${labelIsoDate(globals.co2.when)}`} series={globals.co2.series} color="#9a4e24" />
-            <PulseCard kicker="Methane" value={fmt(globals.methane.value, 1)} unit="ppb trend" note={ch4When} series={globals.methane.series} color="#8a5a12" />
-            <PulseCard kicker="Nitrous oxide" value={fmt(globals.nitrous.value, 2)} unit="ppb trend" note={n2oWhen} series={globals.nitrous.series} color="#1d4e89" />
-            <PulseCard kicker="Temperature anomaly" value={fmtSigned(globals.temperature.value, 2)} unit="°C land-ocean" note={labelDecimalYear(globals.temperature.when)} series={globals.temperature.series} color="#8d2f2a" />
-            <PulseCard kicker="Sea ice" value={fmtSigned(globals.ice.anomaly, 2)} unit="million km² anomaly" note={`${fmt(globals.ice.extent, 2)} extent · ${iceWhen}`} series={globals.ice.series} color="#1d4e89" />
+            <PulseCard kicker={t.co2} value={fmt(globals.co2.value, 2)} unit={t.ppmTrend} note={t.cycle(fmt(globals.co2.cycle, 1), labelIsoDate(globals.co2.when))} series={globals.co2.series} color="#d4532b" />
+            <PulseCard kicker={t.methane} value={fmt(globals.methane.value, 1)} unit={t.ppbTrend} note={ch4When} series={globals.methane.series} color="#b7791f" />
+            <PulseCard kicker={t.n2o} value={fmt(globals.nitrous.value, 2)} unit={t.ppbTrend} note={n2oWhen} series={globals.nitrous.series} color="#1a6aa8" />
+            <PulseCard kicker={t.anomaly} value={fmtSigned(globals.temperature.value, 2)} unit={t.landOcean} note={labelDecimalYear(globals.temperature.when)} series={globals.temperature.series} color="#c0392b" />
+            <PulseCard kicker={t.seaIce} value={fmtSigned(globals.ice.anomaly, 2)} unit={t.iceUnit} note={t.iceNote(fmt(globals.ice.extent, 2), iceWhen)} series={globals.ice.series} color="#1a6aa8" />
           </>
         )}
       </section>
@@ -251,21 +270,21 @@ export default function App() {
       <div className="workspace">
         <aside className="finder">
           <div className="search">
-            <label htmlFor="place-search">Place or coordinates</label>
+            <label htmlFor="place-search">{t.placeOrCoordinates}</label>
             <div className="search-field">
             <div className="search-row">
               <input
                 id="place-search"
                 value={query}
-                placeholder="City, or lat, lon"
+                placeholder={t.searchPlaceholder}
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
               />
               <button type="button" className="locate" onClick={() => void locateMe()}>
-                Locate
+                {t.locate}
               </button>
             </div>
-            {searching && <p className="hint">Searching the gazetteer…</p>}
+            {searching && <p className="hint">{t.searching}</p>}
             {shownResults.length > 0 && (
               <ul className="results">
                 {shownResults.map((item) => (
@@ -280,7 +299,7 @@ export default function App() {
             )}
             </div>
           </div>
-          <div className="index" aria-label="Reference stations">
+          <div className="index" aria-label={t.referenceStations}>
             {REFERENCE.map((item) => (
               <button
                 key={item.name}
@@ -288,13 +307,13 @@ export default function App() {
                 className={item.name === place.name ? "chip active" : "chip"}
                 onClick={() => openPlace(item)}
               >
-                {item.name}
+                {localizePlace(item, lang).name}
               </button>
             ))}
           </div>
           <div className="map-plate">
             <ObserveMap lat={place.latitude} lon={place.longitude} onPick={(lat, lon) => void chooseMap(lat, lon)} />
-            <p className="map-caption">Esri Dark Gray. Tap the chart to open that coordinate.</p>
+            <p className="map-caption">{t.mapCaption}</p>
           </div>
           {notice && <p className="inline-error">{notice}</p>}
         </aside>
@@ -302,15 +321,15 @@ export default function App() {
         <main className="board">
           <section className="place-head">
             <div>
-              <p className="kicker">Virtual station</p>
-              <h2>{place.name}</h2>
-              <p className="sub">{[place.admin, place.country].filter(Boolean).join(", ")}</p>
-              <div className="desk-switch" role="tablist" aria-label="Desk">
+              <p className="kicker">{t.virtualStation}</p>
+              <h2>{shown.name}</h2>
+              <p className="sub">{[shown.admin, shown.country].filter(Boolean).join(lang === "fa" ? "، " : ", ")}</p>
+              <div className="desk-switch" role="tablist" aria-label={t.desk}>
                 <button type="button" role="tab" aria-selected={desk === "briefing"} onClick={() => setDesk("briefing")}>
-                  Briefing
+                  {t.briefing}
                 </button>
                 <button type="button" role="tab" aria-selected={desk === "method"} onClick={() => setDesk("method")}>
-                  Method
+                  {t.method}
                 </button>
               </div>
             </div>
@@ -318,27 +337,27 @@ export default function App() {
               <span>{coordPair(place.latitude, place.longitude)}</span>
               {weather && (
                 <>
-                  <span>Elevation {fmt(weather.elevation, 0)} m</span>
+                  <span>{t.elevation(fmt(weather.elevation, 0))}</span>
                   <span>{clock || weather.timezone}</span>
                 </>
               )}
             </div>
           </section>
 
-          {desk === "method" && <MethodNote outlook={outlook} />}
+          {desk === "method" && <MethodNote outlook={outlook} t={t} />}
 
           {desk === "briefing" && wxState === "error" && (
             <section className="sheet error-sheet">
-              <h3>This location could not be loaded</h3>
-              <p className="prose">Check the connection and try again.</p>
+              <h3>{t.loadErrorTitle}</h3>
+              <p className="prose">{t.loadErrorBody}</p>
               <button type="button" className="retry" onClick={retry}>
-                Try again
+                {t.tryAgain}
               </button>
             </section>
           )}
 
           {desk === "briefing" && wxState === "loading" && (
-            <section className="sheet" aria-label="Loading observations">
+            <section className="sheet" aria-label={t.loading}>
               <div className="skeleton hero-skeleton" />
               <div className="metric-grid">
                 {Array.from({ length: 8 }, (_, index) => (
@@ -352,7 +371,7 @@ export default function App() {
             <>
               <section className="sheet hero">
                 <div>
-                  <p className="kicker">{weather.current.is_day ? "Day" : "Night"} · {weather.timezoneAbbreviation}</p>
+                  <p className="kicker">{weather.current.is_day ? t.day : t.night} · {weather.timezoneAbbreviation}</p>
                   <p className="temp">
                     {fmt(weather.current.temperature_2m, 1)}
                     <span>°C</span>
@@ -360,13 +379,13 @@ export default function App() {
                   <p className="condition">{weatherText(weather.current.weather_code)}</p>
                 </div>
                 <div className="hero-side">
-                  <p>Feels like {fmt(weather.current.apparent_temperature, 1)}°</p>
+                  <p>{t.feelsLike(fmt(weather.current.apparent_temperature, 1))}</p>
                   <p>
-                    Today {fmt(weather.daily.temperature_2m_min[0], 0)}° to {fmt(weather.daily.temperature_2m_max[0], 0)}°
+                    {t.todayRange(fmt(weather.daily.temperature_2m_min[0], 0), fmt(weather.daily.temperature_2m_max[0], 0))}
                   </p>
                   {outlook?.monthAnomaly != null && (
                     <p className={outlook.monthAnomaly >= 0 ? "delta hot" : "delta cold"}>
-                      {fmtSigned(outlook.monthAnomaly, 1)}° against the {monthName(monthIndex)} mean, 1991–2000
+                      {t.monthDelta(fmtSigned(outlook.monthAnomaly, 1), monthName(monthIndex))}
                     </p>
                   )}
                   <div className="scale" aria-hidden="true">
@@ -375,46 +394,46 @@ export default function App() {
                 </div>
               </section>
 
-              <p className="observed-label">Observed now</p>
-              <section className="metric-grid" aria-label="Current parameters">
-                <Metric label="Humidity" value={fmt(weather.current.relative_humidity_2m, 0)} unit="%" />
-                <Metric label="Dew point" value={fmt(weather.current.dew_point_2m, 1)} unit="°C" />
-                <Metric label="Sea-level pressure" value={fmt(weather.current.pressure_msl, 0)} unit="hPa" />
-                <Metric label="Wind" value={fmt(weather.current.wind_speed_10m, 1)} unit={`km/h ${windDir(weather.current.wind_direction_10m)}`} hint={`Gust ${fmt(weather.current.wind_gusts_10m, 0)}`} />
-                <Metric label="Precipitation" value={fmt(weather.current.precipitation, 1)} unit="mm" />
-                <Metric label="Cloud cover" value={fmt(weather.current.cloud_cover, 0)} unit="%" />
-                <Metric label="Visibility" value={fmt(weather.current.visibility / 1000, 1)} unit="km" />
-                <Metric label="UV index" value={fmt(weather.current.uv_index, 1)} unit={uvLabel(weather.current.uv_index)} />
-                <Metric label="Vapor pressure deficit" value={fmt(weather.current.vapour_pressure_deficit, 2)} unit="kPa" />
-                <Metric label="Reference ET₀" value={fmt(weather.current.et0_fao_evapotranspiration, 2)} unit="mm" />
-                <Metric label="Convective energy" value={fmt(weather.current.cape, 0)} unit="J/kg" />
-                <Metric label="Shortwave radiation" value={fmt(weather.current.shortwave_radiation, 0)} unit="W/m²" />
+              <p className="observed-label">{t.observedNow}</p>
+              <section className="metric-grid" aria-label={t.currentParameters}>
+                <Metric label={t.humidity} value={fmt(weather.current.relative_humidity_2m, 0)} unit="%" />
+                <Metric label={t.dewPoint} value={fmt(weather.current.dew_point_2m, 1)} unit="°C" />
+                <Metric label={t.pressure} value={fmt(weather.current.pressure_msl, 0)} unit="hPa" />
+                <Metric label={t.wind} value={fmt(weather.current.wind_speed_10m, 1)} unit={`km/h ${windDir(weather.current.wind_direction_10m)}`} hint={t.gust(fmt(weather.current.wind_gusts_10m, 0))} />
+                <Metric label={t.precipitation} value={fmt(weather.current.precipitation, 1)} unit="mm" />
+                <Metric label={t.cloudCover} value={fmt(weather.current.cloud_cover, 0)} unit="%" />
+                <Metric label={t.visibility} value={fmt(weather.current.visibility / 1000, 1)} unit="km" />
+                <Metric label={t.uvIndex} value={fmt(weather.current.uv_index, 1)} unit={uvLabel(weather.current.uv_index)} />
+                <Metric label={t.vpd} value={fmt(weather.current.vapour_pressure_deficit, 2)} unit="kPa" />
+                <Metric label={t.et0} value={fmt(weather.current.et0_fao_evapotranspiration, 2)} unit="mm" />
+                <Metric label={t.cape} value={fmt(weather.current.cape, 0)} unit="J/kg" />
+                <Metric label={t.radiation} value={fmt(weather.current.shortwave_radiation, 0)} unit="W/m²" />
               </section>
 
               {air && airInfo && (
                 <section className="sheet">
                   <div className="figure-head">
                     <div>
-                      <p className="figure-id">Column</p>
-                      <h3>Air quality</h3>
+                      <p className="figure-id">{t.column}</p>
+                      <h3>{t.airQuality}</h3>
                     </div>
                     <span className={`pill ${airInfo.tone}`}>{airInfo.label}</span>
                   </div>
                   <div className="air-layout">
                     <div className="gauge-wrap">
-                      <AqiGauge value={air.european_aqi} />
+                      <AqiGauge value={air.european_aqi} label={t.chartAqi} />
                       <p className="gauge-value">{fmt(air.european_aqi, 0)}</p>
-                      <p className="hint">European index · US {fmt(air.us_aqi, 0)}</p>
+                      <p className="hint">{t.europeanIndex(fmt(air.us_aqi, 0))}</p>
                     </div>
                     <div className="metric-grid compact">
                       <Metric label="PM2.5" value={fmt(air.pm2_5, 1)} unit="µg/m³" />
                       <Metric label="PM10" value={fmt(air.pm10, 1)} unit="µg/m³" />
-                      <Metric label="Ozone" value={fmt(air.ozone, 1)} unit="µg/m³" />
-                      <Metric label="Nitrogen dioxide" value={fmt(air.nitrogen_dioxide, 1)} unit="µg/m³" />
-                      <Metric label="Sulphur dioxide" value={fmt(air.sulphur_dioxide, 1)} unit="µg/m³" />
-                      <Metric label="Carbon monoxide" value={fmt(air.carbon_monoxide, 0)} unit="µg/m³" />
-                      <Metric label="Dust" value={fmt(air.dust, 1)} unit="µg/m³" />
-                      <Metric label="Aerosol optical depth" value={fmt(air.aerosol_optical_depth, 2)} unit="AOD" />
+                      <Metric label={t.ozone} value={fmt(air.ozone, 1)} unit="µg/m³" />
+                      <Metric label={t.no2} value={fmt(air.nitrogen_dioxide, 1)} unit="µg/m³" />
+                      <Metric label={t.so2} value={fmt(air.sulphur_dioxide, 1)} unit="µg/m³" />
+                      <Metric label={t.co} value={fmt(air.carbon_monoxide, 0)} unit="µg/m³" />
+                      <Metric label={t.dust} value={fmt(air.dust, 1)} unit="µg/m³" />
+                      <Metric label={t.aod} value={fmt(air.aerosol_optical_depth, 2)} unit="AOD" />
                     </div>
                   </div>
                 </section>
@@ -423,15 +442,22 @@ export default function App() {
               <section className="sheet">
                 <div className="figure-head">
                   <div>
-                    <p className="figure-id">Fig. 1</p>
-                    <h3>Next 24 hours</h3>
+                    <p className="figure-id">{t.fig1}</p>
+                    <h3>{t.next24}</h3>
                   </div>
                   <span className="legend">
-                    <i className="swatch ice" /> Temperature
-                    <i className="swatch copper" /> Precipitation
+                    <i className="swatch ice" /> {t.temperature}
+                    <i className="swatch copper" /> {t.precipitation}
                   </span>
                 </div>
-                <HourRibbon temps={hours.map((hour) => hour.temp)} precips={hours.map((hour) => hour.precip)} />
+                <HourRibbon
+                  temps={hours.map((hour) => hour.temp)}
+                  precips={hours.map((hour) => hour.precip)}
+                  label={t.chartHour}
+                  now={t.chartNow}
+                  ahead={t.chartAhead}
+                  note={t.chartPrecipNote}
+                />
                 <div className="hour-axis">
                   {hours.filter((_, index) => index % 4 === 0).map((hour) => (
                     <span key={hour.time}>{hourLabel(hour.time)}</span>
@@ -442,15 +468,15 @@ export default function App() {
               <section className="sheet">
                 <div className="figure-head">
                   <div>
-                    <p className="figure-id">Fig. 2</p>
-                    <h3>Seven days</h3>
+                    <p className="figure-id">{t.fig2}</p>
+                    <h3>{t.sevenDays}</h3>
                   </div>
                   <span className="legend">
-                    <i className="swatch copper" /> High
-                    <i className="swatch ice" /> Low
+                    <i className="swatch copper" /> {t.high}
+                    <i className="swatch ice" /> {t.low}
                   </span>
                 </div>
-                <WeekChart maxes={weather.daily.temperature_2m_max} mins={weather.daily.temperature_2m_min} />
+                <WeekChart maxes={weather.daily.temperature_2m_max} mins={weather.daily.temperature_2m_min} label={t.chartWeek} />
                 <div className="days">
                   {weather.daily.time.map((day, index) => (
                     <article key={day}>
@@ -459,8 +485,8 @@ export default function App() {
                       <b>
                         {fmt(weather.daily.temperature_2m_max[index], 0)}° / {fmt(weather.daily.temperature_2m_min[index], 0)}°
                       </b>
-                      <em>Rain {fmt(weather.daily.precipitation_sum[index], 1)} mm · {fmt(weather.daily.precipitation_probability_max[index], 0)}%</em>
-                      <em>Wind {fmt(weather.daily.wind_speed_10m_max[index], 0)} · UV {fmt(weather.daily.uv_index_max[index], 0)} · ET₀ {fmt(weather.daily.et0_fao_evapotranspiration[index], 1)}</em>
+                      <em>{t.rainLine(fmt(weather.daily.precipitation_sum[index], 1), fmt(weather.daily.precipitation_probability_max[index], 0))}</em>
+                      <em>{t.windLine(fmt(weather.daily.wind_speed_10m_max[index], 0), fmt(weather.daily.uv_index_max[index], 0), fmt(weather.daily.et0_fao_evapotranspiration[index], 1))}</em>
                     </article>
                   ))}
                 </div>
@@ -472,69 +498,67 @@ export default function App() {
             <section className="sheet">
               <div className="figure-head">
                 <div>
-                  <p className="figure-id">Fig. 3</p>
-                  <h3>Climate outlook</h3>
+                  <p className="figure-id">{t.fig3}</p>
+                  <h3>{t.climateOutlook}</h3>
                 </div>
-                <span className="hint">Unweighted mean of three HighResMIP models</span>
+                <span className="hint">{t.ensembleHint}</span>
               </div>
               {climateState === "loading" && <div className="skeleton climate-skeleton" />}
-              {climateState === "error" && <p className="inline-error">The climate-model series failed to load for this point.</p>}
+              {climateState === "error" && <p className="inline-error">{t.climateError}</p>}
               {climate && outlook && climateState === "ready" && (
                 <>
                   <div className="delta-row">
                     <article>
-                      <p>Annual temperature change</p>
+                      <p>{t.annualTempChange}</p>
                       <strong className={outlook.annualTempDelta >= 0 ? "hot" : "cold"}>{fmtSigned(outlook.annualTempDelta, 2)}°C</strong>
                       <span>
-                        {fmt(climate.baseline.annualTemp, 1)}° in {outlook.baselineLabel} to {fmt(climate.future.annualTemp, 1)}° in {outlook.futureLabel}
+                        {t.annualRange(fmt(climate.baseline.annualTemp, 1), outlook.baselineLabel, fmt(climate.future.annualTemp, 1), outlook.futureLabel)}
                       </span>
                     </article>
                     <article>
-                      <p>Annual precipitation change</p>
+                      <p>{t.annualPrecipChange}</p>
                       <strong>{fmtSigned(outlook.annualPrecipDeltaPct, 1)}%</strong>
                       <span>
-                        {fmt(climate.baseline.annualPrecip, 0)} to {fmt(climate.future.annualPrecip, 0)} mm
+                        {t.precipRange(fmt(climate.baseline.annualPrecip, 0), fmt(climate.future.annualPrecip, 0))}
                       </span>
                     </article>
                   </div>
                   <div className="figure-head tight">
-                    <h3>Monthly mean temperature</h3>
+                    <h3>{t.monthlyTemp}</h3>
                     <span className="legend">
-                      <i className="swatch ice" /> 1991–2000
-                      <i className="swatch copper" /> 2041–2050
+                      <i className="swatch ice" /> {t.baselineYears}
+                      <i className="swatch copper" /> {t.futureYears}
                     </span>
                   </div>
-                  <ClimateLines baseline={climate.baseline.temp} future={climate.future.temp} low={climate.future.tempLow} high={climate.future.tempHigh} />
-                  <p className="hint">The copper band is the spread across the three models in 2041–2050. Mean monthly spread {fmt(outlook.futureSpread, 2)}°C.</p>
+                  <ClimateLines baseline={climate.baseline.temp} future={climate.future.temp} low={climate.future.tempLow} high={climate.future.tempHigh} label={t.chartClimate} />
+                  <p className="hint">{t.spreadHint(fmt(outlook.futureSpread, 2))}</p>
                   <div className="figure-head tight">
-                    <h3>Monthly precipitation</h3>
+                    <h3>{t.monthlyPrecip}</h3>
                   </div>
-                  <PrecipBars baseline={climate.baseline.precip} future={climate.future.precip} />
+                  <PrecipBars baseline={climate.baseline.precip} future={climate.future.precip} label={t.chartPrecip} />
                   <table className="model-table">
                     <thead>
                       <tr>
-                        <th>Model</th>
-                        <th>1991–2000</th>
-                        <th>2041–2050</th>
-                        <th>ΔT</th>
-                        <th>Future rain</th>
+                        <th>{t.model}</th>
+                        <th>{t.baselineYears}</th>
+                        <th>{t.futureYears}</th>
+                        <th>{t.deltaT}</th>
+                        <th>{t.futureRain}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {outlook.models.map((model) => (
                         <tr key={model.label}>
                           <td>{model.label}</td>
-                          <td>{fmt(model.baselineTemp, 2)}°</td>
-                          <td>{fmt(model.futureTemp, 2)}°</td>
-                          <td>{fmtSigned(model.tempDelta, 2)}°</td>
-                          <td>{fmt(model.futurePrecip, 0)} mm</td>
+                          <td data-label={t.baselineYears}>{fmt(model.baselineTemp, 2)}°</td>
+                          <td data-label={t.futureYears}>{fmt(model.futureTemp, 2)}°</td>
+                          <td data-label={t.deltaT}>{fmtSigned(model.tempDelta, 2)}°</td>
+                          <td data-label={t.futureRain}>{fmt(model.futurePrecip, 0)} mm</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <p className="disclaimer">
-                    Model-grid means, not station observations. HighResMIP through 2050 is not a substitute for CMIP6 scenarios or the IPCC reports when a decision has to be official. The reduction itself is in <code>src/lib/outlook.ts</code>.
-                  </p>
+                  <p className="disclaimer">{t.disclaimer}</p>
                 </>
               )}
             </section>
@@ -544,36 +568,38 @@ export default function App() {
             <section className="sheet">
               <div className="figure-head">
                 <div>
-                  <p className="figure-id">Hydrology</p>
-                  <h3>River discharge</h3>
+                  <p className="figure-id">{t.hydrology}</p>
+                  <h3>{t.riverDischarge}</h3>
                 </div>
-                <span className="hint">GloFAS · nearest watercourse</span>
+                <span className="hint">{t.glofas}</span>
               </div>
               {Math.max(...flood.river_discharge.map((value) => (value != null && Number.isFinite(value) ? value : 0))) < 0.05 ? (
-                <p className="prose">The nearest watercourse is negligible this week.</p>
+                <p className="prose">{t.negligible}</p>
               ) : (
-                <DischargeLine values={flood.river_discharge} />
+                <DischargeLine values={flood.river_discharge} label={t.chartRiver} />
               )}
             </section>
           )}
 
           <section className="sheet about">
-            <p className="figure-id">Record</p>
-            <h3>About this briefing</h3>
-            <p className="prose">
-              ClimaScope keeps the forecast, the air column, GloFAS discharge, and the HighResMIP decade comparison on one sheet. Another project can import the ensemble without the map.
-            </p>
+            <p className="figure-id">{t.record}</p>
+            <h3>{t.aboutTitle}</h3>
+            <p className="prose">{t.aboutBody}</p>
             <div className="developer">
+              <p className="developer-name">
+                <span>{t.developerLabel}</span>
+                {t.developerName}
+              </p>
               <a href={`mailto:${DEVELOPER_EMAIL}`}>
-                <span>Developer</span>
+                <span>{t.email}</span>
                 {DEVELOPER_EMAIL}
               </a>
               <a href="https://github.com/naomi197" target="_blank" rel="noreferrer">
-                <span>GitHub</span>
+                <span>{t.github}</span>
                 github.com/naomi197
               </a>
             </div>
-            <p className="hint">Sources: Open-Meteo forecast, air quality, climate, and flood APIs; global-warming.org for CO₂, methane, N₂O, the GISS anomaly, and sea ice; Esri basemap. Version 1.1.0.</p>
+            <p className="hint">{t.aboutHint}</p>
           </section>
         </main>
       </div>

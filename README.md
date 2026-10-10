@@ -3,7 +3,7 @@
 ## Station briefing for any point on Earth
 
 [![Live observatory](https://img.shields.io/badge/Live-naomi197.github.io%2Fclimascope-17211c?style=for-the-badge)](https://naomi197.github.io/climascope/)
-[![APK](https://img.shields.io/badge/Download-ClimaScope.apk-1d4e89?style=for-the-badge)](https://github.com/naomi197/climascope/releases/latest/download/ClimaScope.apk)
+[![APK](https://img.shields.io/badge/Download-ClimaScope.apk-0c304e?style=for-the-badge)](https://github.com/naomi197/climascope/releases/latest/download/ClimaScope.apk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2a2f33?style=for-the-badge)](LICENSE)
 
 ClimaScope puts four records on one sheet: the live atmosphere, the air column, GloFAS river discharge, and a three-model HighResMIP comparison of 1991–2000 with 2041–2050. The same ensemble can be imported without the interface.

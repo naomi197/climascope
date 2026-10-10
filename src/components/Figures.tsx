@@ -1,9 +1,9 @@
 import { shortMonth } from "../lib/format.ts"
 
-const INK = "#1d4e89"
-const COPPER = "#9a4e24"
-const GRID = "#e4dfd3"
-const MUTE = "#6f6a60"
+const INK = "#1a6aa8"
+const COPPER = "#d4532b"
+const GRID = "#e2ebf2"
+const MUTE = "#6d8192"
 
 type Point = { x: number; y: number }
 
@@ -61,7 +61,21 @@ export function Sparkline({ values, color = INK }: { values: number[]; color?: s
   )
 }
 
-export function HourRibbon({ temps, precips }: { temps: number[]; precips: number[] }) {
+export function HourRibbon({
+  temps,
+  precips,
+  label = "Temperature and precipitation over the next 24 hours",
+  now = "now",
+  ahead = "+24 h",
+  note = "°C · bars are precipitation",
+}: {
+  temps: number[]
+  precips: number[]
+  label?: string
+  now?: string
+  ahead?: string
+  note?: string
+}) {
   const width = 640
   const height = 188
   const pad = { l: 36, r: 12, t: 16, b: 28 }
@@ -71,9 +85,9 @@ export function HourRibbon({ temps, precips }: { temps: number[]; precips: numbe
   const area = `${linePath(points)} L${points[points.length - 1]?.x ?? pad.l} ${baseY} L${points[0]?.x ?? pad.l} ${baseY} Z`
   const maxPrecip = Math.max(...precips, 0.1)
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Temperature and precipitation over the next 24 hours">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
       <Grid min={min} max={max} yAt={yAt} left={pad.l} right={width - pad.r} />
-      <path d={area} fill="rgba(29,78,137,0.08)" />
+      <path d={area} fill="rgba(26,106,168,0.12)" />
       <path d={linePath(points)} fill="none" stroke={INK} strokeWidth="1.8" />
       {precips.map((value, index) => {
         const x = points[index]?.x ?? 0
@@ -81,13 +95,13 @@ export function HourRibbon({ temps, precips }: { temps: number[]; precips: numbe
         return <rect key={index} x={x - 2.2} y={baseY - h} width="4.4" height={h} fill={COPPER} opacity={value > 0 ? 0.85 : 0.25} />
       })}
       <text x={pad.l} y={height - 8} className="chart-tick">
-        now
+        {now}
       </text>
       <text x={width - pad.r} y={height - 8} textAnchor="end" className="chart-tick">
-        +24 h
+        {ahead}
       </text>
       <text x={width - pad.r} y="14" textAnchor="end" className="chart-tick">
-        °C · bars are precipitation
+        {note}
       </text>
     </svg>
   )
@@ -98,11 +112,13 @@ export function ClimateLines({
   future,
   low,
   high,
+  label = "Monthly mean temperature, baseline and future ensemble",
 }: {
   baseline: number[]
   future: number[]
   low: number[]
   high: number[]
+  label?: string
 }) {
   const width = 640
   const height = 230
@@ -114,9 +130,9 @@ export function ClimateLines({
   const lower = project(low)
   const band = `${linePath(upper)} ${[...lower].reverse().map((point) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ")} Z`
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Monthly mean temperature, baseline and future ensemble">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
       <Grid min={min} max={max} yAt={yAt} left={pad.l} right={width - pad.r} />
-      <path d={band} fill="rgba(154,78,36,0.14)" />
+      <path d={band} fill="rgba(212,83,43,0.16)" />
       <path d={linePath(base)} fill="none" stroke={INK} strokeWidth="1.7" />
       <path d={linePath(next)} fill="none" stroke={COPPER} strokeWidth="1.9" />
       {base.map((point, index) => (
@@ -131,7 +147,15 @@ export function ClimateLines({
   )
 }
 
-export function PrecipBars({ baseline, future }: { baseline: number[]; future: number[] }) {
+export function PrecipBars({
+  baseline,
+  future,
+  label = "Monthly precipitation, baseline and future ensemble",
+}: {
+  baseline: number[]
+  future: number[]
+  label?: string
+}) {
   const width = 640
   const height = 196
   const pad = { l: 36, r: 12, t: 16, b: 28 }
@@ -141,7 +165,7 @@ export function PrecipBars({ baseline, future }: { baseline: number[]; future: n
   const baseY = height - pad.b
   const scale = (value: number) => ((Number.isFinite(value) ? value : 0) / max) * (baseY - pad.t)
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Monthly precipitation, baseline and future ensemble">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
       <line x1={pad.l} x2={width - pad.r} y1={baseY} y2={baseY} stroke={GRID} />
       <text x={pad.l - 6} y={pad.t + 4} textAnchor="end" className="chart-tick">
         {max.toFixed(0)}
@@ -170,7 +194,7 @@ export function PrecipBars({ baseline, future }: { baseline: number[]; future: n
   )
 }
 
-export function AqiGauge({ value }: { value: number }) {
+export function AqiGauge({ value, label = "European air quality index" }: { value: number; label?: string }) {
   const capped = Math.max(0, Math.min(value, 100))
   const angle = (capped / 100) * 180
   const radians = ((180 - angle) * Math.PI) / 180
@@ -180,10 +204,10 @@ export function AqiGauge({ value }: { value: number }) {
   const x = cx + r * Math.cos(radians)
   const y = cy - r * Math.sin(radians)
   return (
-    <svg className="gauge" viewBox="0 0 220 128" role="img" aria-label="European air quality index">
-      <path d="M32 104 A78 78 0 0 1 188 104" fill="none" stroke="#e6e1d6" strokeWidth="10" />
+    <svg className="gauge" viewBox="0 0 220 128" role="img" aria-label={label}>
+      <path d="M32 104 A78 78 0 0 1 188 104" fill="none" stroke="#e2ebf2" strokeWidth="10" />
       <path d="M32 104 A78 78 0 0 1 188 104" fill="none" stroke="url(#aqiScale)" strokeWidth="10" />
-      <circle cx={x} cy={y} r="4.5" fill="#17211c" />
+      <circle cx={x} cy={y} r="4.5" fill="#0c304e" />
       <text x="32" y="122" className="chart-tick">
         0
       </text>
@@ -192,16 +216,16 @@ export function AqiGauge({ value }: { value: number }) {
       </text>
       <defs>
         <linearGradient id="aqiScale" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#1f7a4d" />
-          <stop offset="45%" stopColor="#8a5a12" />
-          <stop offset="100%" stopColor="#8d2f2a" />
+          <stop offset="0%" stopColor="#1b7a4a" />
+          <stop offset="45%" stopColor="#d6a01a" />
+          <stop offset="100%" stopColor="#c0392b" />
         </linearGradient>
       </defs>
     </svg>
   )
 }
 
-export function DischargeLine({ values }: { values: Array<number | null> }) {
+export function DischargeLine({ values, label = "River discharge over seven days" }: { values: Array<number | null>; label?: string }) {
   const series = values.map((value) => (value != null && Number.isFinite(value) ? value : Number.NaN))
   const width = 640
   const height = 120
@@ -209,7 +233,7 @@ export function DischargeLine({ values }: { values: Array<number | null> }) {
   const { project, min, max, yAt } = chartFrame([series], width, height, pad)
   const points = project(series)
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="River discharge over seven days">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
       <Grid min={min} max={max} yAt={yAt} left={pad.l} right={width - pad.r} />
       <path d={linePath(points)} fill="none" stroke={INK} strokeWidth="1.8" />
       <text x={width - pad.r} y="12" textAnchor="end" className="chart-tick">
@@ -219,7 +243,7 @@ export function DischargeLine({ values }: { values: Array<number | null> }) {
   )
 }
 
-export function WeekChart({ maxes, mins }: { maxes: number[]; mins: number[] }) {
+export function WeekChart({ maxes, mins, label = "Seven-day temperature range" }: { maxes: number[]; mins: number[]; label?: string }) {
   const width = 640
   const height = 168
   const pad = { l: 36, r: 12, t: 14, b: 16 }
@@ -228,9 +252,9 @@ export function WeekChart({ maxes, mins }: { maxes: number[]; mins: number[] }) 
   const lo = project(mins)
   const band = `${linePath(hi)} ${[...lo].reverse().map((point) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ")} Z`
   return (
-    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Seven-day temperature range">
+    <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
       <Grid min={min} max={max} yAt={yAt} left={pad.l} right={width - pad.r} />
-      <path d={band} fill="rgba(29,78,137,0.08)" />
+      <path d={band} fill="rgba(26,106,168,0.12)" />
       <path d={linePath(hi)} fill="none" stroke={COPPER} strokeWidth="1.7" />
       <path d={linePath(lo)} fill="none" stroke={INK} strokeWidth="1.7" />
       <text x={width - pad.r} y="12" textAnchor="end" className="chart-tick" fill={MUTE}>
